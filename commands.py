@@ -1,0 +1,268 @@
+import random
+import logging
+
+logger = logging.getLogger("TwitchBot")
+
+
+def handle_test(connection, channel, username, chatters, ignored_users):
+    """!test - Bot test command"""
+    connection.privmsg(channel, "✅ Bot działa!")
+
+
+def handle_buu(connection, channel, username, chatters, ignored_users):
+    """!buu - Scare a random chatter"""
+    target = get_random_chatter(chatters, ignored_users, username)
+    if not target:
+        connection.privmsg(channel, "Nie ma kogo wystraszyć! sadCat")
+        return
+    connection.privmsg(channel, f"{username} straszy {target}! aaaa")
+
+
+def handle_fmk(connection, channel, username, chatters, ignored_users):
+    """!fmk - Fuck Marry Kill game"""
+    valid_users = [u for u in chatters if u not in ignored_users and u != username]
+    if len(valid_users) < 3:
+        connection.privmsg(channel, "Potrzeba minimum 3 osób! ALERT")
+        return
+    users = random.sample(valid_users, 3)
+    connection.privmsg(
+        channel,
+        f"fuck - {users[0]} Segz, "
+        f"marry - {users[1]} peepoLove, "
+        f"kill - {users[2]} Deadge"
+    )
+
+
+def handle_hug(connection, channel, username, chatters, ignored_users):
+    """!hug - Give a hug"""
+    target = get_random_chatter(chatters, ignored_users, username)
+    if not target:
+        connection.privmsg(channel, "Nie ma nikogo do przytulenia! sadCat")
+        return
+    connection.privmsg(channel, f"{username} serdecznie przytula {target} hugg")
+
+
+def handle_kiss(connection, channel, username, chatters, ignored_users):
+    """!kiss - Give a kiss"""
+    target = get_random_chatter(chatters, ignored_users, username)
+    if not target:
+        connection.privmsg(channel, "Nie ma komu dać buziaka! sadCat")
+        return
+    connection.privmsg(
+        channel,
+        f"{username} daje buzaka w czółko dla @{target} catKISS"
+    )
+
+
+def handle_bite(connection, channel, username, chatters, ignored_users):
+    """!bite - Bite a random chatter"""
+    target = get_random_chatter(chatters, ignored_users, username)
+    if not target:
+        connection.privmsg(channel, "Nie ma kogo ugryźć! sadCat")
+        return
+    connection.privmsg(
+        channel,
+        f"{username} gryzie {target}! CatBite "
+    )
+
+
+def handle_myszka(connection, channel, username, chatters, ignored_users):
+    """!myszka - Random chatter becomes mouse of the day"""
+    target = get_random_chatter(chatters, ignored_users)
+    if not target:
+        connection.privmsg(channel, "Za mało osób żeby wybrać! ALERT ")
+        return
+    connection.privmsg(channel, f"Dzisiejszą myszką zostaje {target} ohCute")
+
+
+def handle_ship(connection, channel, username, chatters, ignored_users):
+    """!ship - Ship two random chatters"""
+    valid_users = [u for u in chatters if u not in ignored_users]
+    if len(valid_users) < 2:
+        connection.privmsg(channel, "Za mało osób na czacie! ALERT")
+        return
+    user1, user2 = random.sample(valid_users, 2)
+    percent = random.randint(0, 100)
+    connection.privmsg(channel, f"Ship {user1} z {user2} ma {percent}% Sure")
+
+
+def handle_60(connection, channel, username, chatters, ignored_users):
+    """!60 - Random chatter becomes sixtieth of the day"""
+    target = get_random_chatter(chatters, ignored_users)
+    if not target:
+        connection.privmsg(channel, "Za mało osób żeby wybrać! ALERT ")
+        return
+    connection.privmsg(channel, f"Sześćdziesioną dzisiejszego dnia zostaje {target} monkaO")
+
+
+def handle_dekiel(connection, channel, username, chatters, ignored_users):
+    """!dekiel - Random chatter becomes dekiel of the day"""
+    target = get_random_chatter(chatters, ignored_users)
+    if not target:
+        connection.privmsg(channel, "Za mało osób żeby wybrać! ALERT ")
+        return
+    connection.privmsg(channel, f"Deklem dzisiejszego dnia zostaje {target} xdx")
+
+
+def handle_aura(connection, channel, username, chatters, ignored_users):
+    """!aura - Get today's aura"""
+    aura = random.randint(-2, 1000)
+    connection.privmsg(channel, f"{username} ma dzisiaj {aura} Aury baseg")
+
+
+def handle_iq(connection, channel, username, chatters, ignored_users):
+    """!iq - Get today's IQ"""
+    iq = random.randint(-2, 200)
+    connection.privmsg(channel, f"{username} masz {iq} iq Nerdge")
+
+
+def handle_cmd(connection, channel, username, chatters, ignored_users):
+    """!cmd - List all commands"""
+    connection.privmsg(
+        channel,
+        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !branie | !cmd | !dc | !classic"
+    )
+
+
+def handle_dc(connection, channel, username, chatters, ignored_users, discord_link):
+    """!dc - Discord link"""
+    connection.privmsg(channel, f"Zapraszam na Discorda! {discord_link}")
+
+
+def get_random_chatter(chatters, ignored_users, exclude_user=None):
+    """Get a random chatter, optionally excluding a user"""
+    valid_users = [
+        u for u in chatters
+        if u not in ignored_users
+        and u != exclude_user
+    ]
+    if not valid_users:
+        return None
+    return random.choice(valid_users)
+
+
+def handle_gay(connection, channel, username, chatters, ignored_users):
+    """!gay - Dzisiejszym gejem jest user"""
+    target = get_random_chatter(chatters, ignored_users)
+    if not target:
+        connection.privmsg(channel, "Za mało osób żeby wybrać! ALERT")
+        return
+    connection.privmsg(channel, f"Dzisiejszym gejem zostaje {target} Gayge")
+
+
+def handle_cute(connection, channel, username, chatters, ignored_users):
+    """!cute - user jest w % słodki"""
+    percent = random.randint(0, 100)
+    connection.privmsg(channel, f"{username} jest {percent}% słodki/a SoCute ")
+
+
+def handle_adopt(connection, channel, username, chatters, ignored_users):
+    """!adopt - user adoptuje user"""
+    target = get_random_chatter(chatters, ignored_users, username)
+    if not target:
+        connection.privmsg(channel, "Nie ma kogo adoptować! ALERT")
+        return
+    connection.privmsg(channel, f"{username} adoptuje {target} :d ")
+
+
+def handle_redflag(connection, channel, username, chatters, ignored_users):
+    """!redflag - user jest w % redflagiem"""
+    percent = random.randint(0, 100)
+    connection.privmsg(channel, f"{username} jest {percent}% redflagiem redFLG ")
+
+
+def handle_greenflag(connection, channel, username, chatters, ignored_users):
+    """!greenflag - user jest w % greenflagiem"""
+    percent = random.randint(0, 100)
+    connection.privmsg(channel, f"{username} jest {percent}% greenflagiem greenFLG ")
+
+
+def handle_jealous(connection, channel, username, chatters, ignored_users):
+    """!jealous - user jest w % zazdrosny o user"""
+    target = get_random_chatter(chatters, ignored_users, username)
+    if not target:
+        connection.privmsg(channel, "Nie ma o kogo być zazdrosnym! ALERT")
+        return
+    percent = random.randint(0, 100)
+    connection.privmsg(channel, f"{username} jest {percent}% zazdrosny/a o {target} catLook ")
+
+
+def handle_romantic(connection, channel, username, chatters, ignored_users):
+    """!romantic - user jest w % romantyczny"""
+    percent = random.randint(0, 100)
+    connection.privmsg(channel, f"{username} jest {percent}% romantyczny/a  Romantic ")
+
+
+def handle_Princess(connection, channel, username, chatters, ignored_users):
+    """!Princess - user jest w % księżniczką"""
+    percent = random.randint(0, 100)
+    connection.privmsg(channel, f"{username} jest {percent}% księżniczką princess ")
+
+
+def handle_Prince(connection, channel, username, chatters, ignored_users):
+    """!Prince - user jest w % księciem"""
+    percent = random.randint(0, 100)
+    connection.privmsg(channel, f"{username} jest {percent}% księciem prince ")
+
+def handle_branie(connection, channel, username, chatters, ignored_users):
+    """!branie - randomuser ma branie na randomuser"""
+    valid_users = [u for u in chatters if u not in ignored_users]
+    if len(valid_users) < 2:
+        connection.privmsg(channel, "Za mało osób na czacie żeby wybrać! ALERT")
+        return
+    user1, user2 = random.sample(valid_users, 2)
+    connection.privmsg(channel, f"{user1} ma branie na {user2}! onniewie ")
+
+def handle_classic(connection, channel, username, chatters, ignored_users):
+    """!classic - user samo się klikło Kek """
+    connection.privmsg(channel, f"{username} samo się klikło Kek ")
+
+def handle_urlop(connection, channel, username, chatters, ignored_users):
+    """!urlop - ide na urlop """
+    connection.privmsg(channel, f" ide na urlop :b  ")
+
+# Command registry - maps command names to handler functions
+COMMANDS = {
+    "!test": handle_test,
+    "!buu": handle_buu,
+    "!fmk": handle_fmk,
+    "!hug": handle_hug,
+    "!kiss": handle_kiss,
+    "!bite": handle_bite,
+    "!myszka": handle_myszka,
+    "!ship": handle_ship,
+    "!60": handle_60,
+    "!dekiel": handle_dekiel,
+    "!aura": handle_aura,
+    "!iq": handle_iq,
+    "!gay": handle_gay,
+    "!cute": handle_cute,
+    "!adopt": handle_adopt,
+    "!redflag": handle_redflag,
+    "!greenflag": handle_greenflag,
+    "!jealous": handle_jealous,
+    "!romantic": handle_romantic,
+    "!princess": handle_Princess,
+    "!prince": handle_Prince,
+    "!branie": handle_branie,
+    "!classic": handle_classic,
+    "!urlop": handle_urlop,
+    "!cmd": handle_cmd,
+    "!dc": handle_dc,
+}
+
+
+def process_command(msg, connection, channel, username, chatters, ignored_users, discord_link):
+    """Process a command message"""
+    for command, handler in COMMANDS.items():
+        if msg.startswith(command):
+            try:
+                # Special case for !dc which needs discord_link
+                if command == "!dc":
+                    handler(connection, channel, username, chatters, ignored_users, discord_link)
+                else:
+                    handler(connection, channel, username, chatters, ignored_users)
+            except Exception as e:
+                logger.exception(f"Błąd w komendzie {command}: {e}")
+            return True
+    return False
