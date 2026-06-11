@@ -1,6 +1,7 @@
 import irc.bot
 import random
 import os
+import sys
 import logging
 
 from dotenv import load_dotenv
@@ -59,6 +60,7 @@ IGNORED_USERS = {
     "tangiabot",
     "own3d",
     "creatisbot",
+    "soundalerts",
     NICK.lower()
 }
 
@@ -81,6 +83,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         self.channel = CHANNEL
         self.chatters = set()
+        self.streamer = CHANNEL.strip("#").lower()
 
     # ==================================
     # LOSOWY CHATTER
@@ -107,6 +110,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         logger.info(f"Zalogowano jako {NICK}")
 
+        # Request Twitch-specific capabilities for tags
+        connection.cap("REQ", ":twitch.tv/tags")
+
         connection.join(self.channel)
 
         logger.info(f"Dołączono do {self.channel}")
@@ -130,8 +136,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
             msg = message.strip().lower()
 
+            # Extract tags if available
+            tags = {}
+            if hasattr(event, 'tags') and event.tags:
+                tags = {tag['key']: tag['value'] for tag in event.tags}
+
             # Przetwórz komendę
-            process_command(msg, connection, self.channel, username, self.chatters, IGNORED_USERS, DISCORD_LINK)
+            process_command(msg, connection, self.channel, username, self.chatters, IGNORED_USERS, DISCORD_LINK, self.streamer, tags)
 
         except Exception as e:
 

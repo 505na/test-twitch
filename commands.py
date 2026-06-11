@@ -1,5 +1,7 @@
 import random
 import logging
+import os
+import sys
 
 logger = logging.getLogger("TwitchBot")
 
@@ -50,7 +52,7 @@ def handle_kiss(connection, channel, username, chatters, ignored_users):
         return
     connection.privmsg(
         channel,
-        f"{username} daje buzaka w czółko dla @{target} catKISS"
+        f"{username} daje buzaka w czółko dla {target} catKISS"
     )
 
 
@@ -120,7 +122,7 @@ def handle_cmd(connection, channel, username, chatters, ignored_users):
     """!cmd - List all commands"""
     connection.privmsg(
         channel,
-        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !branie | !cmd | !dc | !classic"
+        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !branie | !cmd | !dc | !classic | !reload"
     )
 
 
@@ -221,6 +223,24 @@ def handle_urlop(connection, channel, username, chatters, ignored_users):
     """!urlop - ide na urlop """
     connection.privmsg(channel, f" ide na urlop :b  ")
 
+
+def handle_reload(connection, channel, username, streamer, tags):
+    """!reload - Reload the bot (streamer and mods only)"""
+    # Check if user is streamer or moderator
+    is_streamer = username == streamer
+    is_mod = tags.get('mod') == '1'
+    is_broadcaster = tags.get('badges', '').find('broadcaster') != -1
+    
+    if not (is_streamer or is_mod or is_broadcaster):
+        connection.privmsg(channel, f"Nie masz uprawnień! Tylko streamer i moderacja mogą przeładować bota.")
+        return
+    
+    logger.info(f"[RELOAD] Bot przeładowywany przez {username}")
+    connection.privmsg(channel, f"Przeładowuję bota... DankMods")
+    
+    # Restart the bot
+    os.execl(sys.executable, sys.executable, sys.argv[0])
+
 # Command registry - maps command names to handler functions
 COMMANDS = {
     "!test": handle_test,
@@ -247,19 +267,26 @@ COMMANDS = {
     "!branie": handle_branie,
     "!classic": handle_classic,
     "!urlop": handle_urlop,
+    "!reload": handle_reload,
     "!cmd": handle_cmd,
     "!dc": handle_dc,
 }
 
 
-def process_command(msg, connection, channel, username, chatters, ignored_users, discord_link):
+def process_command(msg, connection, channel, username, chatters, ignored_users, discord_link, streamer=None, tags=None):
     """Process a command message"""
+    if tags is None:
+        tags = {}
+    
     for command, handler in COMMANDS.items():
         if msg.startswith(command):
             try:
                 # Special case for !dc which needs discord_link
                 if command == "!dc":
                     handler(connection, channel, username, chatters, ignored_users, discord_link)
+                # Special case for !reload which needs streamer and tags
+                elif command == "!reload":
+                    handler(connection, channel, username, streamer, tags)
                 else:
                     handler(connection, channel, username, chatters, ignored_users)
             except Exception as e:
