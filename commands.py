@@ -122,7 +122,7 @@ def handle_cmd(connection, channel, username, chatters, ignored_users):
     """!cmd - List all commands"""
     connection.privmsg(
         channel,
-        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !branie | !cmd | !dc | !classic | !reload"
+        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !princepałki | !princessa | !princepolo | !branie | !cmd | !dc | !classic | !urlop | !reload"
     )
 
 
@@ -224,6 +224,21 @@ def handle_urlop(connection, channel, username, chatters, ignored_users):
     connection.privmsg(channel, f" ide na urlop :b  ")
 
 
+def handle_princepałki(connection, channel, username, chatters, ignored_users):
+    """!princepałki - Special prince response"""
+    connection.privmsg(channel, f"{username} IDZ I SE KUP! Clap")
+
+
+def handle_princessa(connection, channel, username, chatters, ignored_users):
+    """!princessa - Special princess response"""
+    connection.privmsg(channel, f"{username} NIE MAM, KUP SE! Clap")
+
+
+def handle_princepolo(connection, channel, username, chatters, ignored_users):
+    """!princepolo - Special prince response"""
+    connection.privmsg(channel, f"{username} NIE MAM, IDZ I SE KUP! Clap")
+
+
 def handle_reload(connection, channel, username, streamer, tags):
     """!reload - Reload the bot (streamer and mods only)"""
     # Check if user is streamer or moderator
@@ -264,6 +279,9 @@ COMMANDS = {
     "!romantic": handle_romantic,
     "!princess": handle_Princess,
     "!prince": handle_Prince,
+    "!princepałki": handle_princepałki,
+    "!princessa": handle_princessa,
+    "!princepolo": handle_princepolo,
     "!branie": handle_branie,
     "!classic": handle_classic,
     "!urlop": handle_urlop,
