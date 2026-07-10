@@ -131,7 +131,7 @@ def handle_cmd(connection, channel, username, chatters, ignored_users):
     """!cmd - List all commands"""
     connection.privmsg(
         channel,
-        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !makowiec | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !princepałki | !princessa | !princepolo | !branie | !cmd | !dc | !classic | !urlop | !reload"
+        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !makowiec | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !princepałki | !princessa | !princepolo | !branie | !cmd | !dc | !classic | !urlop | !reload | !update"
     )
 
 
@@ -265,6 +265,40 @@ def handle_reload(connection, channel, username, streamer, tags):
     # Restart the bot
     os.execl(sys.executable, sys.executable, sys.argv[0])
 
+
+def handle_update(connection, channel, username, streamer, tags):
+    """!update - Pull latest changes and restart the bot (streamer and mods only)"""
+    is_streamer = username == streamer
+    is_mod = tags.get('mod') == '1'
+    is_broadcaster = tags.get('badges', '').find('broadcaster') != -1
+
+    if not (is_streamer or is_mod or is_broadcaster):
+        connection.privmsg(channel, "Nie masz uprawnień! Tylko streamer i moderacja mogą aktualizować bota.")
+        return
+
+    logger.info(f"[UPDATE] Aktualizacja przez {username}")
+    connection.privmsg(channel, "Aktualizuję bota... DankMods")
+
+    repo_path = os.path.dirname(os.path.abspath(__file__))
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["git", "pull", "--ff-only"],
+            cwd=repo_path,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            connection.privmsg(channel, f"Błąd aktualizacji: {result.stderr.strip() or result.stdout.strip() or 'brak informacji'}")
+            return
+        connection.privmsg(channel, "Aktualizacja zakończona. Restartuję bota...")
+    except FileNotFoundError:
+        connection.privmsg(channel, "Nie znaleziono git. Upewnij się, że git jest zainstalowany.")
+        return
+
+    os.execl(sys.executable, sys.executable, sys.argv[0])
+
 # Command registry - maps command names to handler functions
 COMMANDS = {
     "!test": handle_test,
@@ -296,6 +330,7 @@ COMMANDS = {
     "!classic": handle_classic,
     "!urlop": handle_urlop,
     "!reload": handle_reload,
+    "!update": handle_update,
     "!cmd": handle_cmd,
     "!dc": handle_dc,
 }
@@ -317,8 +352,8 @@ def process_command(msg, connection, channel, username, chatters, ignored_users,
                 # Special case for !dc which needs discord_link
                 if registered_command == "!dc":
                     handler(connection, channel, username, chatters, ignored_users, discord_link)
-                # Special case for !reload which needs streamer and tags
-                elif registered_command == "!reload":
+                # Special case for !reload and !update which need streamer and tags
+                elif registered_command in {"!reload", "!update"}:
                     handler(connection, channel, username, streamer, tags)
                 else:
                     handler(connection, channel, username, chatters, ignored_users)
