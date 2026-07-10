@@ -77,6 +77,15 @@ def handle_myszka(connection, channel, username, chatters, ignored_users):
     connection.privmsg(channel, f"Dzisiejszą myszką zostaje {target} ohCute")
 
 
+def handle_makowiec(connection, channel, username, chatters, ignored_users):
+    """!makowiec - Random chatter eats a makowiec"""
+    target = get_random_chatter(chatters, ignored_users, username)
+    if not target:
+        connection.privmsg(channel, "Nikt nie je makowaca !")
+        return
+    connection.privmsg(channel, f"{target} wpierdala makowca monkaO")
+
+
 def handle_ship(connection, channel, username, chatters, ignored_users):
     """!ship - Ship two random chatters"""
     valid_users = [u for u in chatters if u not in ignored_users]
@@ -122,7 +131,7 @@ def handle_cmd(connection, channel, username, chatters, ignored_users):
     """!cmd - List all commands"""
     connection.privmsg(
         channel,
-        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !princepałki | !princessa | !princepolo | !branie | !cmd | !dc | !classic | !urlop | !reload"
+        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !makowiec | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !princepałki | !princessa | !princepolo | !branie | !cmd | !dc | !classic | !urlop | !reload"
     )
 
 
@@ -265,6 +274,7 @@ COMMANDS = {
     "!kiss": handle_kiss,
     "!bite": handle_bite,
     "!myszka": handle_myszka,
+    "!makowiec": handle_makowiec,
     "!ship": handle_ship,
     "!60": handle_60,
     "!dekiel": handle_dekiel,
@@ -295,19 +305,24 @@ def process_command(msg, connection, channel, username, chatters, ignored_users,
     """Process a command message"""
     if tags is None:
         tags = {}
-    
-    for command, handler in COMMANDS.items():
-        if msg.startswith(command):
+
+    if not msg:
+        return False
+
+    command = msg.split()[0]
+
+    for registered_command, handler in COMMANDS.items():
+        if command == registered_command:
             try:
                 # Special case for !dc which needs discord_link
-                if command == "!dc":
+                if registered_command == "!dc":
                     handler(connection, channel, username, chatters, ignored_users, discord_link)
                 # Special case for !reload which needs streamer and tags
-                elif command == "!reload":
+                elif registered_command == "!reload":
                     handler(connection, channel, username, streamer, tags)
                 else:
                     handler(connection, channel, username, chatters, ignored_users)
             except Exception as e:
-                logger.exception(f"Błąd w komendzie {command}: {e}")
+                logger.exception(f"Błąd w komendzie {registered_command}: {e}")
             return True
     return False
