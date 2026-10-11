@@ -131,7 +131,7 @@ def handle_cmd(connection, channel, username, chatters, ignored_users):
     """!cmd - List all commands"""
     connection.privmsg(
         channel,
-        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !makowiec | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !princepałki | !princessa | !princepolo | !branie | !cmd | !dc | !classic | !urlop | !reload | !update"
+        "!test | !buu | !fmk | !hug | !kiss | !bite | !myszka | !makowiec | !ship | !60 | !dekiel | !aura | !iq | !gay | !cute | !adopt | !redflag | !greenflag | !jealous | !romantic | !princess | !prince | !princepałki | !princessa | !princepolo | !branie | !randka | !kawa | !cmd | !dc | !classic | !urlop | !reload | !update"
     )
 
 
@@ -223,6 +223,32 @@ def handle_branie(connection, channel, username, chatters, ignored_users):
         return
     user1, user2 = random.sample(valid_users, 2)
     connection.privmsg(channel, f"{user1} ma branie na {user2}! onniewie ")
+
+
+def handle_randka(connection, channel, username, chatters, ignored_users):
+    """!randka - Two random chatters go on a date"""
+    ignored_users_lower = {u.lower() for u in ignored_users}
+    valid_users = [u for u in chatters if u.lower() not in ignored_users_lower]
+    if len(valid_users) < 2:
+        connection.privmsg(channel, "Za mało osób na czacie żeby wybrać! ALERT")
+        return
+    user1, user2 = random.sample(valid_users, 2)
+    connection.privmsg(channel, f"{user1} idzie na randke z {user2} BLACHARA")
+
+
+def handle_kawa(connection, channel, username, chatters, ignored_users):
+    """!kawa - Two random chatters go for coffee"""
+    ignored_users_lower = {u.lower() for u in ignored_users}
+    valid_users = [u for u in chatters if u.lower() not in ignored_users_lower]
+    if len(valid_users) < 2:
+        connection.privmsg(channel, "Za mało osób na czacie żeby wybrać! ALERT")
+        return
+    user1, user2 = random.sample(valid_users, 2)
+    connection.privmsg(
+        channel,
+        f"{user1} chętnie wyskoczy na kawkę z {user2} peepoCoffee",
+    )
+
 
 def handle_classic(connection, channel, username, chatters, ignored_users):
     """!classic - user samo się klikło Kek """
@@ -327,6 +353,8 @@ COMMANDS = {
     "!princessa": handle_princessa,
     "!princepolo": handle_princepolo,
     "!branie": handle_branie,
+    "!randka": handle_randka,
+    "!kawa": handle_kawa,
     "!classic": handle_classic,
     "!urlop": handle_urlop,
     "!reload": handle_reload,
